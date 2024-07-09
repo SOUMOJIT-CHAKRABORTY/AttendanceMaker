@@ -1,16 +1,17 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
-  Button,
   TouchableOpacity,
 } from 'react-native';
 import {Image} from 'react-native';
 
 const HomeScreen = () => {
   const [email, setEmail] = useState<String>('');
+  const navigate = useNavigation();
   return (
     <View style={styles.container}>
       <Image
@@ -32,7 +33,9 @@ const HomeScreen = () => {
           style={styles.textInput}
           keyboardType="email-address"
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigate.navigate('Profile')}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </View>
@@ -56,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   image: {
     width: 200, // Set your image width
@@ -90,6 +93,7 @@ const styles = StyleSheet.create({
     padding: 10, // Add some padding for the button
     paddingHorizontal: 20, // Add horizontal padding to the button
     borderRadius: 20, // Add border radius to make it look nicer
+    marginTop: 10, // Add some margin at the top
   },
   buttonText: {
     color: 'white', // Set the text color to white
