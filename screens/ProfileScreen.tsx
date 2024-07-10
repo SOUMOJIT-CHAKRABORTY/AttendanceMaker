@@ -17,6 +17,8 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const [isCheckInEnabled, setIsCheckInEnabled] = React.useState(false);
   const [isCheckedIn, setIsCheckedIn] = React.useState(false);
+  const [showButtons, setShowButtons] = React.useState(true);
+  const [checkOutTimestamp, setCheckOutTimestamp] = React.useState('');
   const [checkInTimestamp, setCheckInTimestamp] = React.useState('');
 
   React.useEffect(() => {
@@ -48,6 +50,17 @@ const ProfileScreen = () => {
     console.log(`Check In time: ${formattedDate}`);
     setIsCheckedIn(true);
     setIsCheckInEnabled(false);
+  };
+  const handleCheckOut = () => {
+    const checkOutTimestamp = Date.now();
+    const cdate = new Date(checkOutTimestamp);
+    const formattedDateOut = cdate.toLocaleString();
+    setCheckOutTimestamp(formattedDateOut);
+    console.log(`Check Out timestamp: ${checkOutTimestamp}`);
+    console.log(`Check Out time: ${formattedDateOut}`);
+    // setIsCheckedIn(false);
+    setShowButtons(false);
+    // setIsCheckInEnabled(true);
   };
 
   return (
@@ -84,21 +97,47 @@ const ProfileScreen = () => {
             Welcome To The Office
           </Text>
           <Text style={{marginTop: 30, fontSize: 18, fontWeight: '700'}}>
-            {isCheckedIn
+            {isCheckedIn && !checkOutTimestamp
               ? `You have successfully checked in at: ${checkInTimestamp}`
+              : isCheckedIn && checkOutTimestamp
+              ? `You have checked out at: ${checkOutTimestamp}`
               : 'Please check in to start your day.'}
           </Text>
         </View>
       </View>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[
           styles.checkInButton,
           {backgroundColor: isCheckInEnabled ? '#007BFF' : '#cccccc'},
         ]}
         onPress={handleCheckIn}
-        disabled={!isCheckInEnabled}>
-        <Text style={styles.checkInButtonText}>Check In</Text>
-      </TouchableOpacity>
+        // disabled={!isCheckInEnabled}
+      >
+        <Text style={styles.checkInButtonText}>
+          {!isCheckedIn ? `Check In` : `Check Out`}
+        </Text>
+      </TouchableOpacity> */}
+      {showButtons &&
+        (!isCheckedIn ? (
+          <TouchableOpacity
+            style={[
+              styles.checkInButton,
+              {backgroundColor: isCheckInEnabled ? '#007BFF' : '#cccccc'},
+            ]}
+            onPress={handleCheckIn}
+            disabled={!isCheckInEnabled}>
+            <Text style={styles.checkInButtonText}>Check In</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.checkInButton,
+              {backgroundColor: '#FF0000'}, // Different color for Check Out
+            ]}
+            onPress={handleCheckOut}>
+            <Text style={styles.checkInButtonText}>Check Out</Text>
+          </TouchableOpacity>
+        ))}
     </View>
   );
 };
