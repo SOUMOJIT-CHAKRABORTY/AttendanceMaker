@@ -6,12 +6,58 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Platform,
+  Alert,
 } from 'react-native';
 import {Image} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 const HomeScreen = () => {
-  const [email, setEmail] = useState<String>('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const navigate = useNavigation();
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || dateOfBirth;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDateOfBirth(currentDate);
+  };
+
+  const showDatepicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const handleLogin = async () => {
+    try {
+      const formattedDateOfBirth = moment(dateOfBirth).format('YYYY-MM-DD');
+
+      const response = await fetch('http://192.168.0.106:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: mobileNumber,
+          dateOfBirth: formattedDateOfBirth,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.status === 200) {
+        Alert.alert('Login Successful', result.message);
+        navigate.navigate('Profile', {employee: result.employee});
+      } else {
+        Alert.alert('Login Failed', result.message);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      Alert.alert('Login Error', 'An error occurred during login.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -27,15 +73,29 @@ const HomeScreen = () => {
           placeholder="Mobile Number"
           style={styles.textInput}
           keyboardType="number-pad"
+          onChangeText={setMobileNumber}
+          value={mobileNumber}
         />
-        <TextInput
-          placeholder="Employee ID"
-          style={styles.textInput}
-          keyboardType="email-address"
-        />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigate.navigate('Profile')}>
+        <View>
+          <TouchableOpacity onPress={showDatepicker} style={styles.dateInput}>
+            <Text style={styles.dateText}>
+              {dateOfBirth
+                ? dateOfBirth.toISOString().split('T')[0]
+                : 'Select Date of Birth'}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={dateOfBirth}
+              mode="date"
+              display="default"
+              onChange={onChange}
+              maximumDate={new Date()} // Users cannot select a future date
+            />
+          )}
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
       </View>
@@ -85,20 +145,32 @@ const styles = StyleSheet.create({
     width: '80%',
     justifyContent: 'center',
     alignItems: 'center',
-    // margin: 'auto',
     padding: 20,
   },
+  dateInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    width: 250,
+    borderRadius: 20,
+    marginBottom: 10,
+    justifyContent: 'center',
+  },
+  dateText: {
+    color: '#000',
+  },
   button: {
-    backgroundColor: '#3D77BB', // Set the background color to blue
-    padding: 10, // Add some padding for the button
-    paddingHorizontal: 20, // Add horizontal padding to the button
-    borderRadius: 20, // Add border radius to make it look nicer
-    marginTop: 10, // Add some margin at the top
+    backgroundColor: '#3D77BB',
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginTop: 10,
   },
   buttonText: {
-    color: 'white', // Set the text color to white
-    textAlign: 'center', // Center the text horizontally
-    fontWeight: 'bold', // Make the text bold
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
 
