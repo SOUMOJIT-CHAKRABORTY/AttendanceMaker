@@ -187,18 +187,26 @@ app.post('/checkOut', async (req, res) => {
   try {
     const {employeeId} = req.body;
 
+    if (!employeeId) {
+      return res.status(400).json({message: 'Employee ID is required'});
+    }
+
     // Get the current date and time
     const now = new Date().toISOString();
+    const currentDate = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
 
     // Find the latest attendance record for the employee on the current date
     const attendance = await Attendance.findOneAndUpdate(
       {
         employeeId,
-        date: new Date().toISOString().split('T')[0],
-        checkOut: {$exists: false},
+        date: currentDate,
+        checkOut: {$exists: false}, // Ensure check-out has not already been done
       },
-      {checkOut: now},
-      {new: true},
+      {
+        checkOut: now,
+        status: 'Checked Out', // Update the status to "Checked Out"
+      },
+      {new: true}, // Return the updated document
     );
 
     if (!attendance) {
@@ -213,6 +221,7 @@ app.post('/checkOut', async (req, res) => {
     res.status(500).json({message: 'Failed to check out'});
   }
 });
+
 // Endpoint for getting current attendance status
 app.get('/attendanceStatus', async (req, res) => {
   try {
