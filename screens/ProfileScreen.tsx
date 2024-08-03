@@ -3,8 +3,8 @@ import * as React from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import GetLocation from 'react-native-get-location';
 
-const TARGET_LATITUDE = 37.4220936;
-const TARGET_LONGITUDE = -122.083922;
+const TARGET_LATITUDE = 22.422838;
+const TARGET_LONGITUDE = 88.410678;
 const DISTANCE_THRESHOLD = 0.001; // Adjust this value for your acceptable distance range
 
 const isLocationWithinThreshold = (latitude, longitude) => {
@@ -48,19 +48,22 @@ const ProfileScreen = () => {
     try {
       const now = new Date().toISOString(); // ISO format for timestamp
 
-      const response = await fetch('http://192.168.0.106:8000/attendance', {
-        // Update with your backend URL
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://attendancemaker.onrender.com/attendance',
+        {
+          // Update with your backend URL
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            employeeId: employee._id,
+            employeeName: employee.employeeName,
+            status: 'Checked In',
+            checkIn: now,
+          }),
         },
-        body: JSON.stringify({
-          employeeId: employee._id,
-          employeeName: employee.employeeName,
-          status: 'Checked In',
-          checkIn: now,
-        }),
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -80,16 +83,19 @@ const ProfileScreen = () => {
     try {
       const now = new Date().toISOString(); // ISO format for timestamp
 
-      const response = await fetch('http://192.168.0.106:8000/checkOut', {
-        // Update with your backend URL
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://attendancemaker.onrender.com/checkOut',
+        {
+          // Update with your backend URL
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            employeeId: employee._id,
+          }),
         },
-        body: JSON.stringify({
-          employeeId: employee._id,
-        }),
-      });
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -137,7 +143,13 @@ const ProfileScreen = () => {
           <Text style={{fontSize: 24, color: '#97BCE8', fontWeight: 'bold'}}>
             Welcome To The Office
           </Text>
-          <Text style={{marginTop: 30, fontSize: 18, fontWeight: '700'}}>
+          <Text
+            style={{
+              marginTop: 30,
+              fontSize: 18,
+              fontWeight: '700',
+              color: '#000',
+            }}>
             {isCheckedIn && !checkOutTimestamp
               ? `You have successfully checked in at: ${checkInTimestamp}`
               : isCheckedIn && checkOutTimestamp

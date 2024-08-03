@@ -33,16 +33,19 @@ const HomeScreen = () => {
     try {
       const formattedDateOfBirth = moment(dateOfBirth).format('YYYY-MM-DD');
 
-      const response = await fetch('http://192.168.0.106:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://attendancemaker.onrender.com/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: mobileNumber,
+            dateOfBirth: formattedDateOfBirth,
+          }),
         },
-        body: JSON.stringify({
-          phoneNumber: mobileNumber,
-          dateOfBirth: formattedDateOfBirth,
-        }),
-      });
+      );
 
       const result = await response.json();
 
@@ -72,6 +75,7 @@ const HomeScreen = () => {
         <TextInput
           placeholder="Mobile Number"
           style={styles.textInput}
+          placeholderTextColor={'#000'}
           keyboardType="number-pad"
           onChangeText={setMobileNumber}
           value={mobileNumber}
@@ -140,6 +144,7 @@ const styles = StyleSheet.create({
     width: 250, // Ensures the TextInput has sufficient width
     borderRadius: 20,
     marginBottom: 10,
+    color: '#000',
   },
   inputView: {
     width: '80%',

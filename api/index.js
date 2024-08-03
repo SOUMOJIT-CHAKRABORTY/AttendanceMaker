@@ -213,3 +213,37 @@ app.post('/checkOut', async (req, res) => {
     res.status(500).json({message: 'Failed to check out'});
   }
 });
+// Endpoint for getting current attendance status
+app.get('/attendanceStatus', async (req, res) => {
+  try {
+    const {employeeId} = req.query; // Use query parameter instead of body
+    const currentDate = moment().format('YYYY-MM-DD');
+
+    if (!employeeId) {
+      return res.status(400).json({message: 'Employee ID is required'});
+    }
+
+    // Get the employee by ID
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({message: 'Employee not found'});
+    }
+
+    // Get today's attendance record for the specific employee
+    const attendanceRecord = await Attendance.findOne({
+      employeeId,
+      date: currentDate,
+    });
+
+    const attendanceStatus = {
+      employeeId: employee._id,
+      employeeName: employee.employeeName,
+      status: attendanceRecord ? attendanceRecord.status : 'Absent',
+    };
+
+    res.status(200).json(attendanceStatus);
+  } catch (error) {
+    console.error('Error fetching attendance status:', error);
+    res.status(500).json({message: 'Failed to fetch attendance status'});
+  }
+});
