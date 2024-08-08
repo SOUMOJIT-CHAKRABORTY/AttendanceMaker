@@ -35,7 +35,6 @@ const employeeSchema = new mongoose.Schema({
   },
   basicSalary: {
     type: Number,
-    required: true,
   },
   houseRent: {
     type: Number,
