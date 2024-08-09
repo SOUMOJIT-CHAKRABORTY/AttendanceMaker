@@ -155,7 +155,8 @@ const addAttendance = async employeeId => {
 // Endpoint for marking attendance
 app.post('/attendance', async (req, res) => {
   try {
-    const {employeeId, employeeName, status} = req.body;
+    const {employeeId, employeeName, status, location, mobileDetails} =
+      req.body;
 
     // Get the current date and time
     const now = new Date();
@@ -169,6 +170,14 @@ app.post('/attendance', async (req, res) => {
       date,
       status,
       checkIn,
+      location: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      },
+      mobileDetails: {
+        imei: mobileDetails.imei,
+        model: mobileDetails.model,
+      },
     });
 
     // Save the attendance record to the database
