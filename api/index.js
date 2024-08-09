@@ -256,3 +256,50 @@ app.get('/attendanceStatus', async (req, res) => {
     res.status(500).json({message: 'Failed to fetch attendance status'});
   }
 });
+
+app.post('/updateAttendance', async (req, res) => {
+  try {
+    const {employeeId, status, name} = req.body;
+    const currentDate = moment().format('YYYY-MM-DD');
+
+    if (!employeeId || !status) {
+      return res
+        .status(400)
+        .json({message: 'Employee ID and status are required'});
+    }
+
+    // Find the existing attendance record for today or create a new one if status is 'Check In'
+    let attendanceRecord = await Attendance.findOneAndUpdate(
+      {employeeId, date: currentDate},
+      {
+        status,
+        checkOut: status === 'Check Out' ? new Date().toISOString() : undefined,
+      },
+      {new: true},
+    );
+
+    if (!attendanceRecord && status === 'Check In') {
+      // Create a new record if no existing record is found and the status is 'Check In'
+      attendanceRecord = new Attendance({
+        employeeId,
+        employeeName: name,
+        date: currentDate,
+        status,
+        checkIn: new Date().toISOString(),
+      });
+      await attendanceRecord.save();
+    }
+
+    if (!attendanceRecord) {
+      return res.status(404).json({message: 'Attendance record not found'});
+    }
+
+    res.status(200).json({
+      message: 'Attendance updated successfully',
+      attendance: attendanceRecord,
+    });
+  } catch (error) {
+    console.error('Error updating attendance:', error);
+    res.status(500).json({message: 'Failed to update attendance'});
+  }
+});
