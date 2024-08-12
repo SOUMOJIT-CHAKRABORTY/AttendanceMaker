@@ -175,14 +175,6 @@ app.post('/attendance', async (req, res) => {
         imei: mobileDetails.imei,
         model: mobileDetails.model,
       },
-      checkOutLocation: {
-        latitude: '',
-        longitude: '',
-      },
-      checkOutMobileDetails: {
-        imei: '',
-        model: '',
-      },
     });
 
     // Save the attendance record to the database
