@@ -278,6 +278,8 @@ app.get('/attendanceStatus', async (req, res) => {
       checkOutLocation: attendanceRecord
         ? attendanceRecord.checkOutLocation
         : '',
+      checkIn: attendanceRecord ? attendanceRecord.checkIn : '',
+      checkOut: attendanceRecord ? attendanceRecord.checkOut : '',
     };
 
     res.status(200).json(attendanceStatus);
