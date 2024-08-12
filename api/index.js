@@ -175,6 +175,14 @@ app.post('/attendance', async (req, res) => {
         imei: mobileDetails.imei,
         model: mobileDetails.model,
       },
+      checkOutLocation: {
+        latitude: '',
+        longitude: '',
+      },
+      checkOutMobileDetails: {
+        imei: '',
+        model: '',
+      },
     });
 
     // Save the attendance record to the database
@@ -191,7 +199,7 @@ app.post('/attendance', async (req, res) => {
 
 app.post('/checkOut', async (req, res) => {
   try {
-    const {employeeId} = req.body;
+    const {employeeId, mobileDetails, location} = req.body;
 
     if (!employeeId) {
       return res.status(400).json({message: 'Employee ID is required'});
@@ -211,6 +219,14 @@ app.post('/checkOut', async (req, res) => {
       {
         checkOut: now,
         status: 'Checked Out', // Update the status to "Checked Out"
+        checkOutMobileDetails: {
+          imei: mobileDetails.imei,
+          model: mobileDetails.model,
+        }, // Add mobile details
+        checkOutLocation: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        }, // Add location
       },
       {new: true}, // Return the updated document
     );
