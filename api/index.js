@@ -42,21 +42,16 @@ const Attendance = require('./models/attendance');
 // Endpoint for login
 app.post('/login', async (req, res) => {
   try {
-    const {phoneNumber, dateOfBirth} = req.body;
+    const {phoneNumber, pin} = req.body;
 
-    // Parse the dateOfBirth string into a Date object
-    const parsedDateOfBirth = new Date(dateOfBirth);
-
-    // Find employee by phone number and date of birth
+    // Find employee by phone number and pin
     const employee = await Employee.findOne({
       phoneNumber,
-      dateOfBirth: parsedDateOfBirth,
+      pin,
     });
 
     if (!employee) {
-      return res
-        .status(401)
-        .json({message: 'Invalid phone number or date of birth'});
+      return res.status(401).json({message: 'Invalid phone number or PIN'});
     }
 
     // Create a JWT token
@@ -88,6 +83,7 @@ app.post('/addEmployee', async (req, res) => {
       houseRent,
       medicalAllowance,
       providentFund,
+      pin,
     } = req.body;
 
     const employeeId = uuidv4();
@@ -105,6 +101,7 @@ app.post('/addEmployee', async (req, res) => {
       houseRent,
       medicalAllowance,
       providentFund,
+      pin,
     });
 
     await newEmployee.save();

@@ -45,6 +45,10 @@ const employeeSchema = new mongoose.Schema({
   providentFund: {
     type: Number,
   },
+  pin: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Employee = mongoose.model('Employee', employeeSchema);
