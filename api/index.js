@@ -257,6 +257,8 @@ app.get('/attendanceStatus', async (req, res) => {
       employeeId: employee._id,
       employeeName: employee.employeeName,
       status: attendanceRecord ? attendanceRecord.status : 'Absent',
+      mobileDetails: attendanceRecord ? attendanceRecord.mobileDetails : '',
+      location: attendanceRecord ? attendanceRecord.location : '',
     };
 
     res.status(200).json(attendanceStatus);
