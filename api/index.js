@@ -327,3 +327,30 @@ app.post('/updateAttendance', async (req, res) => {
     res.status(500).json({message: 'Failed to update attendance'});
   }
 });
+
+// Endpoint for getting attendance history of a specific employee
+app.get('/attendanceHistory', async (req, res) => {
+  try {
+    const {employeeId} = req.query;
+
+    if (!employeeId) {
+      return res.status(400).json({message: 'Employee ID is required'});
+    }
+
+    // Find attendance records for the given employee, sorted by date (newest first)
+    const attendanceRecords = await Attendance.find({employeeId})
+      .sort({date: -1})
+      .exec();
+
+    if (!attendanceRecords || attendanceRecords.length === 0) {
+      return res
+        .status(404)
+        .json({message: 'No attendance records found for this employee'});
+    }
+
+    res.status(200).json({attendanceRecords});
+  } catch (error) {
+    console.error('Error fetching attendance history:', error);
+    res.status(500).json({message: 'Failed to fetch attendance history'});
+  }
+});
