@@ -354,3 +354,58 @@ app.get('/attendanceHistory', async (req, res) => {
     res.status(500).json({message: 'Failed to fetch attendance history'});
   }
 });
+
+// Endpoint for updating employee details
+app.put('/updateEmployee/:id', async (req, res) => {
+  try {
+    const {id} = req.params; // Get employee ID from URL parameters
+    const {
+      employeeName,
+      designation,
+      phoneNumber,
+      dateOfBirth,
+      joiningDate,
+      activeEmployee,
+      salary,
+      address,
+      basicSalary,
+      houseRent,
+      medicalAllowance,
+      providentFund,
+      pin,
+    } = req.body; // Destructure updated employee details from the request body
+
+    // Find the employee by ID and update the provided fields
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      id,
+      {
+        employeeName,
+        designation,
+        phoneNumber,
+        dateOfBirth,
+        joiningDate,
+        activeEmployee,
+        salary,
+        address,
+        basicSalary,
+        houseRent,
+        medicalAllowance,
+        providentFund,
+        pin,
+      },
+      {new: true}, // Return the updated employee document
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({message: 'Employee not found'});
+    }
+
+    res.status(200).json({
+      message: 'Employee details updated successfully',
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    res.status(500).json({message: 'Failed to update employee'});
+  }
+});
