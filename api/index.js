@@ -411,7 +411,7 @@ app.put('/updateEmployee/:id', async (req, res) => {
 });
 app.delete('/deleteEmployee', async (req, res) => {
   try {
-    const {employeeId} = req.body;
+    const {employeeId} = req.params;
 
     if (!employeeId) {
       return res.status(400).json({message: 'Employee ID is required'});
