@@ -409,3 +409,24 @@ app.put('/updateEmployee/:id', async (req, res) => {
     res.status(500).json({message: 'Failed to update employee'});
   }
 });
+app.delete('/deleteEmployee', async (req, res) => {
+  try {
+    const {employeeId} = req.body;
+
+    if (!employeeId) {
+      return res.status(400).json({message: 'Employee ID is required'});
+    }
+
+    // Find and delete the employee
+    const result = await Employee.findByIdAndDelete(employeeId);
+
+    if (!result) {
+      return res.status(404).json({message: 'Employee not found'});
+    }
+
+    res.status(200).json({message: 'Employee deleted successfully'});
+  } catch (error) {
+    console.error('Error deleting employee:', error);
+    res.status(500).json({message: 'Failed to delete employee'});
+  }
+});
