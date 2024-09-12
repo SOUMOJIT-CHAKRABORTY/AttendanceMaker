@@ -3,12 +3,26 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
 const {v4: uuidv4} = require('uuid');
 
 const app = express();
 const port = 8000;
 const cors = require('cors');
 app.use(cors());
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Folder where salary slips will be saved
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}_${file.originalname}`);
+  },
+});
+
+const upload = multer({storage: storage});
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -412,23 +426,23 @@ app.put('/updateEmployee/:id', async (req, res) => {
 
 app.delete('/deleteEmployee/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const {id} = req.params;
 
     if (!id) {
-      return res.status(400).json({ message: 'Employee ID is required' });
+      return res.status(400).json({message: 'Employee ID is required'});
     }
 
     // Find and delete the employee
     const result = await Employee.findByIdAndDelete(id);
 
     if (!result) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({message: 'Employee not found'});
     }
 
-    res.status(200).json({ message: 'Employee deleted successfully' });
+    res.status(200).json({message: 'Employee deleted successfully'});
   } catch (error) {
     console.error('Error deleting employee:', error);
-    res.status(500).json({ message: 'Failed to delete employee' });
+    res.status(500).json({message: 'Failed to delete employee'});
   }
 });
 
@@ -453,3 +467,40 @@ app.get('/employee/:employeeId', async (req, res) => {
   }
 });
 
+// POST route to save salary details
+app.post(
+  '/salary/:employeeId',
+  upload.single('salarySlip'),
+  async (req, res) => {
+    try {
+      const {employeeId} = req.params;
+      const {salary, travelAllowance, loanRepayment} = req.body;
+
+      // Find the employee by ID
+      const employee = await Employee.findById(employeeId);
+
+      if (!employee) {
+        return res.status(404).json({message: 'Employee not found'});
+      }
+
+      // Update salary details in the employee record
+      employee.salary = salary;
+      employee.travelAllowance = travelAllowance;
+      employee.loanRepayment = loanRepayment;
+
+      // If a salary slip is uploaded, save its path
+      if (req.file) {
+        const salarySlipPath = path.join('uploads', req.file.filename);
+        employee.salarySlip = salarySlipPath;
+      }
+
+      // Save the updated employee record
+      await employee.save();
+
+      res.status(200).json({message: 'Salary details updated successfully'});
+    } catch (error) {
+      console.error('Error saving salary details:', error);
+      res.status(500).json({message: 'Failed to save salary details'});
+    }
+  },
+);

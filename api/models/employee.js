@@ -45,6 +45,9 @@ const employeeSchema = new mongoose.Schema({
   providentFund: {
     type: Number,
   },
+  travelAllowance: Number,
+  loanRepayment: Number,
+  salarySlip: String,
   pin: {
     type: Number,
     required: true,
