@@ -45,6 +45,7 @@ const employeeSchema = new mongoose.Schema({
   providentFund: {
     type: Number,
   },
+  currentSalary: Number,
   travelAllowance: Number,
   loanRepayment: Number,
   salarySlip: String,

@@ -484,7 +484,7 @@ app.post(
       }
 
       // Update salary details in the employee record
-      employee.salary = salary;
+      employee.currentSalary = salary;
       employee.travelAllowance = travelAllowance;
       employee.loanRepayment = loanRepayment;
 
